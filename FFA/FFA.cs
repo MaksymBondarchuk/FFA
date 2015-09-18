@@ -13,12 +13,13 @@ namespace FFA
         double right_border = 5.12;
         double gamma = 1.5;
         double alpha = 1;
-        double eps = .1;
+        long MaximumGenerations = 100;
 
-        double function(double x)
+
+        double f(double x)
         {
             //return x * x - 10 * Math.Cos(2 * Math.PI * x) + 10;
-            return -x * x;
+            return -Math.Pow(x - 2, 2);
         }
 
         public FFA(int number_of_fireflies/*, double gamma, double left_border, double right_border*/)
@@ -29,7 +30,7 @@ namespace FFA
             //this.right_border = right_border;
         }
 
-        public List<double> algorithm()
+        public double algorithm()
         {
             List<double> solutions = new List<double>();
 
@@ -38,22 +39,21 @@ namespace FFA
             for (int i = 0; i < fireflies.Capacity; i++)
                 fireflies.Add(new Firefly(left_border + delta * i));
 
-            bool someone_moved;
-            do
-            {
-                someone_moved = false;
+            Firefly the_best_firefly = fireflies[0];
 
+            for (long t = 0; t < MaximumGenerations; t++)
+            {
                 for (int i = 0; i < fireflies.Count; i++)
                 {
                     bool was_moved = false;
                     for (int j = 0; j < fireflies.Count; j++)
                     {
-                        if (function(fireflies[i].x) < function(fireflies[j].x))
+                        if (f(fireflies[i].x) < f(fireflies[j].x))
                         {
                             was_moved = true;
-                            someone_moved = true;
+                            double r2 = Math.Pow(fireflies[i].x - fireflies[j].x, 2) + Math.Pow(f(fireflies[i].x) - f(fireflies[j].x), 2);
                             fireflies[i].x = fireflies[i].x
-                                + fireflies[i].beta0 * Math.Exp(-gamma * Math.Sqrt(Math.Pow(fireflies[i].x - fireflies[j].x, 2) - Math.Pow(function(fireflies[i].x) - function(fireflies[j].x), 2))) * (fireflies[j].x - fireflies[i].x)
+                                + fireflies[i].beta0 * Math.Exp(-gamma * r2) * (fireflies[j].x - fireflies[i].x)
                                 + alpha * ((new Random()).NextDouble() - .5);
                             if (fireflies[i].x < left_border)
                                 fireflies[i].x = left_border;
@@ -62,25 +62,24 @@ namespace FFA
                                 fireflies[i].x = right_border;
                         }
                     }
-                    if (!was_moved)
-                        fireflies[i].x = fireflies[i].x
-                                + alpha * ((new Random()).NextDouble() - .5);
+                    //if (!was_moved)
+                    //    fireflies[i].x = fireflies[i].x
+                    //            + alpha * ((new Random()).NextDouble() - .5);
                 }
-            }
-            while (someone_moved);
 
-            for (int i = 0; i < fireflies.Count; i++)
-            {
-                bool is_new_solution = true;
-                for (int j = 0; j < i; j++)
-                    if (Math.Abs(function(fireflies[i].x) - function(fireflies[j].x)) < eps)
-                        is_new_solution = false;
+                the_best_firefly = fireflies[0];
+                for (int i = 1; i < fireflies.Count; i++)
+                    if (f(the_best_firefly.x) < f(fireflies[i].x))
+                        the_best_firefly = fireflies[i];
 
-                if (is_new_solution)
-                    solutions.Add(function(fireflies[i].x));
+                Console.Write(String.Format("# {0,4}   ", t));
+                for (int i = 0; i < fireflies.Count; i++)
+                    Console.Write(String.Format("{0,6:.00}", fireflies[i].x));
+                Console.WriteLine(String.Format("    Best {0,5:.00}, {1,5:.00}", the_best_firefly.x, f(the_best_firefly.x)));
             }
 
-            return solutions;
+
+            return f(the_best_firefly.x);
         }
     }
 }

@@ -12,10 +12,7 @@ namespace FFA
         {
             FFA ffa = new FFA(5);
 
-            List<double> solutions = ffa.algorithm();
-
-            for (int i = 0; i < solutions.Count; i++)
-                Console.WriteLine(solutions[i]);
+            ffa.algorithm();
         }
     }
 }
