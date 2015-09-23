@@ -25,7 +25,7 @@ namespace FFA
         public FFA(int number_of_fireflies/*, double gamma, double left_border, double right_border*/)
         {
             fireflies = new List<Firefly>(number_of_fireflies);
-            alpha = (right_border - left_border) / 100.0;
+            alpha = (right_border - left_border) / 100.0; 
             //this.gamma = gamma;
             //this.left_border = left_border;
             //this.right_border = right_border;
