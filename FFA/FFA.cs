@@ -12,8 +12,8 @@ namespace FFA
         double left_border = -5.12;
         double right_border = 5.12;
         double gamma = 1.5;
-        double alpha = 1;
-        long MaximumGenerations = 100;
+        double alpha;
+        long MaximumGenerations = 200;
 
 
         double f(double x)
@@ -25,6 +25,7 @@ namespace FFA
         public FFA(int number_of_fireflies/*, double gamma, double left_border, double right_border*/)
         {
             fireflies = new List<Firefly>(number_of_fireflies);
+            alpha = (right_border - left_border) / 100.0;
             //this.gamma = gamma;
             //this.left_border = left_border;
             //this.right_border = right_border;
@@ -62,9 +63,9 @@ namespace FFA
                                 fireflies[i].x = right_border;
                         }
                     }
-                    //if (!was_moved)
-                    //    fireflies[i].x = fireflies[i].x
-                    //            + alpha * ((new Random()).NextDouble() - .5);
+                    if (!was_moved)
+                        fireflies[i].x = fireflies[i].x
+                                + alpha * ((new Random()).NextDouble() - .5);
                 }
 
                 the_best_firefly = fireflies[0];
