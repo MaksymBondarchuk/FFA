@@ -13,22 +13,40 @@ namespace FFA
         double right_border = 5.12;
         double gamma = 1.5;
         double alpha;
-        long MaximumGenerations = 200;
+        long MaximumGenerations = 400;
+        bool looking_for_max = false;
 
 
         double f(double x)
         {
-            //return x * x - 10 * Math.Cos(2 * Math.PI * x) + 10;
-            return -Math.Pow(x - 2, 2);
+            return x * x - 10 * Math.Cos(2 * Math.PI * x) + 10;
+            //return -Math.Pow(x - 2, 2);
         }
 
         public FFA(int number_of_fireflies/*, double gamma, double left_border, double right_border*/)
         {
             fireflies = new List<Firefly>(number_of_fireflies);
-            alpha = (right_border - left_border) / 100.0; 
+            alpha = (right_border - left_border) / 100.0;
             //this.gamma = gamma;
             //this.left_border = left_border;
             //this.right_border = right_border;
+        }
+
+        private void move_i_towards_j(int i, int j)
+        {
+            double r2 = Math.Pow(fireflies[i].x - fireflies[j].x, 2) + Math.Pow(f(fireflies[i].x) - f(fireflies[j].x), 2);
+            fireflies[i].x += fireflies[i].beta0 * Math.Exp(-gamma * r2) * (fireflies[j].x - fireflies[i].x)
+                + alpha * ((new Random()).NextDouble() - .5);
+            if (fireflies[i].x < left_border)
+                fireflies[i].x = left_border;
+            else
+                if (right_border < fireflies[i].x)
+                fireflies[i].x = right_border;
+        }
+
+        private void move_randomly(int i)
+        {
+            fireflies[i].x += alpha * ((new Random()).NextDouble() - .5);
         }
 
         public double algorithm()
@@ -49,34 +67,41 @@ namespace FFA
                     bool was_moved = false;
                     for (int j = 0; j < fireflies.Count; j++)
                     {
-                        if (f(fireflies[i].x) < f(fireflies[j].x))
+                        if (f(fireflies[i].x) < f(fireflies[j].x) && looking_for_max || 
+                            f(fireflies[j].x) < f(fireflies[i].x) && !looking_for_max)
                         {
                             was_moved = true;
-                            double r2 = Math.Pow(fireflies[i].x - fireflies[j].x, 2) + Math.Pow(f(fireflies[i].x) - f(fireflies[j].x), 2);
-                            fireflies[i].x = fireflies[i].x
-                                + fireflies[i].beta0 * Math.Exp(-gamma * r2) * (fireflies[j].x - fireflies[i].x)
-                                + alpha * ((new Random()).NextDouble() - .5);
-                            if (fireflies[i].x < left_border)
-                                fireflies[i].x = left_border;
-                            else
-                                if (right_border < fireflies[i].x)
-                                fireflies[i].x = right_border;
+                            move_i_towards_j(i, j);
                         }
                     }
-                    if (!was_moved)
-                        fireflies[i].x = fireflies[i].x
-                                + alpha * ((new Random()).NextDouble() - .5);
+                    //if (!was_moved)
+                    //    move_randomly(i);
                 }
 
                 the_best_firefly = fireflies[0];
+                int best_idx = 0;
                 for (int i = 1; i < fireflies.Count; i++)
-                    if (f(the_best_firefly.x) < f(fireflies[i].x))
+                    if (f(the_best_firefly.x) < f(fireflies[i].x) && looking_for_max ||
+                        f(the_best_firefly.x) > f(fireflies[i].x) && !looking_for_max)
+                    {
                         the_best_firefly = fireflies[i];
+                        best_idx = i;
+                    }
 
                 Console.Write(String.Format("# {0,4}   ", t));
                 for (int i = 0; i < fireflies.Count; i++)
-                    Console.Write(String.Format("{0,6:.00}", fireflies[i].x));
-                Console.WriteLine(String.Format("    Best {0,5:.00}, {1,5:.00}", the_best_firefly.x, f(the_best_firefly.x)));
+                {
+                    if (i == best_idx)
+                    {
+                        Console.BackgroundColor = ConsoleColor.Green;
+                        Console.Write(String.Format("{0,6:.00}", fireflies[i].x));
+                        Console.ResetColor();
+                    }
+                    else
+                        Console.Write(String.Format("{0,6:.00}", fireflies[i].x));
+                }
+                Console.WriteLine();
+                //Console.WriteLine(String.Format("    Best {0,5:.00}, {1,5:.00}", the_best_firefly.x, f(the_best_firefly.x)));
             }
 
 
