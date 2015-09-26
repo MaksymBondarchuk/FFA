@@ -13,7 +13,7 @@ namespace FFA
         double right_border = 5.12;
         double gamma = 1.5;
         double alpha;
-        long MaximumGenerations = 400;
+        long MaximumGenerations = 300;
         bool looking_for_max = false;
         int f_range;
 
@@ -114,11 +114,11 @@ namespace FFA
                     if (i == best_idx)
                     {
                         Console.BackgroundColor = ConsoleColor.Green;
-                        Console.Write(String.Format("{0,6:.00}", fireflies[i].x));
+                        Console.Write(String.Format("{0,6:.00}", f(fireflies[i].x)));
                         Console.ResetColor();
                     }
                     else
-                        Console.Write(String.Format("{0,6:.00}", fireflies[i].x));
+                        Console.Write(String.Format("{0,6:.00}", f(fireflies[i].x)));
                 }
                 Console.WriteLine();
             }
