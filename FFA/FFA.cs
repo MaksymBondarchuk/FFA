@@ -13,10 +13,9 @@ namespace FFA
         double right_border = 5.12;
         double gamma = 1.5;
         double alpha;
-        long MaximumGenerations = 300;
+        long MaximumGenerations = 10000;
         bool looking_for_max = false;
         int f_range;
-
 
         double f(List<double> x)
         {
@@ -80,6 +79,9 @@ namespace FFA
             }
 
             Firefly the_best_firefly = fireflies[0];
+            double best_ever = 0;
+            bool best_ever_not_initialized = true;
+            double best_iter;
             for (long t = 0; t < MaximumGenerations; t++)
             {
                 for (int i = 0; i < fireflies.Count; i++)
@@ -88,39 +90,33 @@ namespace FFA
                     for (int j = 0; j < fireflies.Count; j++)
                     {
                         if (f(fireflies[i].x) < f(fireflies[j].x) && looking_for_max ||
-                            f(fireflies[j].x) < f(fireflies[i].x) && !looking_for_max)
+                            f(fireflies[i].x) > f(fireflies[j].x) && !looking_for_max)
                         {
                             was_moved = true;
                             move_i_towards_j(i, j);
                         }
                     }
-                    //if (!was_moved)
-                    //    move_randomly(i);
+                    if (!was_moved)
+                        move_randomly(i);
                 }
 
-                the_best_firefly = fireflies[0];
-                int best_idx = 0;
+                best_iter = f(fireflies[0].x);
                 for (int i = 1; i < fireflies.Count; i++)
-                    if (f(the_best_firefly.x) < f(fireflies[i].x) && looking_for_max ||
-                        f(the_best_firefly.x) > f(fireflies[i].x) && !looking_for_max)
-                    {
-                        the_best_firefly = fireflies[i];
-                        best_idx = i;
-                    }
+                    if (best_iter < f(fireflies[i].x) && looking_for_max ||
+                        best_iter > f(fireflies[i].x) && !looking_for_max)
+                        best_iter = f(fireflies[i].x);
 
-                Console.Write(String.Format("# {0,4}   ", t));
-                for (int i = 0; i < fireflies.Count; i++)
+                if (best_ever_not_initialized)
                 {
-                    if (i == best_idx)
-                    {
-                        Console.BackgroundColor = ConsoleColor.Green;
-                        Console.Write(String.Format("{0,6:.00}", f(fireflies[i].x)));
-                        Console.ResetColor();
-                    }
-                    else
-                        Console.Write(String.Format("{0,6:.00}", f(fireflies[i].x)));
+                    best_ever = best_iter;
+                    best_ever_not_initialized = false;
                 }
-                Console.WriteLine();
+                else
+                if (best_ever < best_iter && looking_for_max ||
+                    best_ever > best_iter && !looking_for_max)
+                    best_ever = best_iter;
+
+                Console.WriteLine(String.Format("# {0,4}   Best iter {1,15:0.0000000000}    Best ever {2,15:0.0000000000}", t, best_iter, best_ever));
             }
 
 

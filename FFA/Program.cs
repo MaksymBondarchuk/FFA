@@ -10,7 +10,7 @@ namespace FFA
     {
         static void Main(string[] args)
         {
-            FFA ffa = new FFA(8, 10);
+            FFA ffa = new FFA(50, 50);
 
             ffa.algorithm();
         }
