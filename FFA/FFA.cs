@@ -11,15 +11,17 @@ namespace FFA
         List<Firefly> fireflies;
         double left_border;
         double right_border;
-        double gamma = 0.01;
-        double alpha;
+        double γ = 0.01;    // bigger gamma => bigger step
+        double α;
         long MaximumGenerations = 1000;
         bool looking_for_max;
         int f_range;
 
         int f_number = 2;
 
+        bool file_trace_iters = true;
         System.IO.StreamWriter file = new System.IO.StreamWriter("results.txt");
+        bool file_trace_moves = true;
         System.IO.StreamWriter file_moves = new System.IO.StreamWriter("trace_moves.txt");
 
         double f(List<double> x)
@@ -47,8 +49,8 @@ namespace FFA
         public FFA(int number_of_fireflies, int f_range)
         {
             fireflies = new List<Firefly>(number_of_fireflies);
-            alpha = (right_border - left_border) / 100.0;
-            alpha = 0.1;
+            α = (right_border - left_border) / 100.0;
+            α = 0.1;
             this.f_range = f_range;
 
             switch (f_number)
@@ -76,10 +78,8 @@ namespace FFA
 
             for (int h = 0; h < f_range; h++)
             {
-                double ddd = fireflies[i].beta0 * Math.Exp(-gamma * r2) * (fireflies[j].x[h] - fireflies[i].x[h]);
-                double dddd = fireflies[i].beta0 * Math.Exp(-gamma * r2) * (fireflies[j].x[h] - fireflies[i].x[h]) + alpha * ((new Random()).NextDouble() - .5);
-                fireflies[i].x[h] += fireflies[i].beta0 * Math.Exp(-gamma * r2) * (fireflies[j].x[h] - fireflies[i].x[h]);
-                //+ alpha * ((new Random()).NextDouble() - .5);
+                fireflies[i].x[h] += fireflies[i].beta0 * Math.Exp(-γ * r2) * (fireflies[j].x[h] - fireflies[i].x[h])
+                + α * ((new Random()).NextDouble() - .5);
                 if (fireflies[i].x[h] < left_border)
                     fireflies[i].x[h] = left_border;
                 else
@@ -92,7 +92,7 @@ namespace FFA
         {
             for (int h = 0; h < f_range; h++)
             {
-                fireflies[i].x[h] += alpha * ((new Random()).NextDouble() - .5);
+                fireflies[i].x[h] += α * ((new Random()).NextDouble() - .5);
                 if (fireflies[i].x[h] < left_border)
                     fireflies[i].x[h] = left_border;
                 else
@@ -138,10 +138,13 @@ namespace FFA
                             was_moved = true;
                             move_i_towards_j(i, j);
 
-                            file_moves.Write(string.Format("# {0,4} {1,4} -> {2,4} ", t, i, j));
-                            for (int ii = 0; ii < fireflies.Count; ii++)
-                                file_moves.Write(string.Format("{0,15:0.0000000000}", fireflies[ii].x[0]));
-                            file_moves.WriteLine();
+                            if (file_trace_moves)
+                            {
+                                file_moves.Write(string.Format("# {0,4} {1,4} -> {2,4} ", t, i, j));
+                                for (int ii = 0; ii < fireflies.Count; ii++)
+                                    file_moves.Write(string.Format("{0,15:0.0000000000}", fireflies[ii].x[0]));
+                                file_moves.WriteLine();
+                            }
                         }
                     }
                     if (!was_moved)
@@ -164,9 +167,12 @@ namespace FFA
                     best_ever > best_iter && !looking_for_max)
                     best_ever = best_iter;
 
-                Console.WriteLine(string.Format("# {0,4}   Best iter {1,15:0.0000000000}    Best ever {2,15:0.0000000000}", t, best_iter, best_ever));
-                file.WriteLine(string.Format("# {0,4}   Best iter {1,15:0.0000000000}    Best ever {2,15:0.0000000000}", t, best_iter, best_ever));
-                file_moves.WriteLine("-----------------------------------------------------------------------------------------");
+                if (file_trace_iters)
+                {
+                    Console.WriteLine(string.Format("# {0,4}   Best iter {1,15:0.0000000000}    Best ever {2,15:0.0000000000}", t, best_iter, best_ever));
+                    file.WriteLine(string.Format("# {0,4}   Best iter {1,15:0.0000000000}    Best ever {2,15:0.0000000000}", t, best_iter, best_ever));
+                    file_moves.WriteLine("-----------------------------------------------------------------------------------------");
+                }
             }
             file.Close();
             file_moves.Close();
