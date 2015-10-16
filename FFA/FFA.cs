@@ -9,27 +9,63 @@ namespace FFA
     class FFA
     {
         List<Firefly> fireflies;
-        double left_border = -5.12;
-        double right_border = 5.12;
-        double gamma = 1.5;
+        double left_border;
+        double right_border;
+        double gamma = 0.01;
         double alpha;
-        long MaximumGenerations = 10000;
-        bool looking_for_max = false;
+        long MaximumGenerations = 1000;
+        bool looking_for_max;
         int f_range;
+
+        int f_number = 2;
+
+        System.IO.StreamWriter file = new System.IO.StreamWriter("results.txt");
+        System.IO.StreamWriter file_moves = new System.IO.StreamWriter("trace_moves.txt");
 
         double f(List<double> x)
         {
             double res = 0;
-            for (int i = 0; i < x.Count; i++)
-                res += x[i] * x[i] - 10 * Math.Cos(2 * Math.PI * x[i]) + 10;
-            return res;
+
+
+            switch (f_number)
+            {
+                // Rosenbrok
+                case 1:
+                    for (int i = 0; i < x.Count; i++)
+                        res += x[i] * x[i] - 10 * Math.Cos(2 * Math.PI * x[i]) + 10;
+                    return res;
+
+                // test
+                case 2:
+                    return x[0]*x[0];
+
+                default:
+                    return 0;
+            }
         }
 
         public FFA(int number_of_fireflies, int f_range)
         {
             fireflies = new List<Firefly>(number_of_fireflies);
             alpha = (right_border - left_border) / 100.0;
+            alpha = 0.1;
             this.f_range = f_range;
+
+            switch (f_number)
+            {
+                case 1:
+                    left_border = -5.12;
+                    right_border = 5.12;
+                    looking_for_max = false;
+                    break;
+                case 2:
+                    left_border = -5;
+                    right_border = 5;
+                    looking_for_max = false;
+                    break;
+                default:
+                    break;
+            }
         }
 
         private void move_i_towards_j(int i, int j)
@@ -40,8 +76,10 @@ namespace FFA
 
             for (int h = 0; h < f_range; h++)
             {
-                fireflies[i].x[h] += fireflies[i].beta0 * Math.Exp(-gamma * r2) * (fireflies[j].x[h] - fireflies[i].x[h])
-                + alpha * ((new Random()).NextDouble() - .5);
+                double ddd = fireflies[i].beta0 * Math.Exp(-gamma * r2) * (fireflies[j].x[h] - fireflies[i].x[h]);
+                double dddd = fireflies[i].beta0 * Math.Exp(-gamma * r2) * (fireflies[j].x[h] - fireflies[i].x[h]) + alpha * ((new Random()).NextDouble() - .5);
+                fireflies[i].x[h] += fireflies[i].beta0 * Math.Exp(-gamma * r2) * (fireflies[j].x[h] - fireflies[i].x[h]);
+                //+ alpha * ((new Random()).NextDouble() - .5);
                 if (fireflies[i].x[h] < left_border)
                     fireflies[i].x[h] = left_border;
                 else
@@ -84,6 +122,11 @@ namespace FFA
             double best_iter;
             for (long t = 0; t < MaximumGenerations; t++)
             {
+                //file.Write(string.Format("# {0,4}", t));
+                //for (int i = 0; i < fireflies.Count; i++)
+                //    file.Write(string.Format("{0,15:0.0000000000}", fireflies[i].x[0]));
+                //file.WriteLine();
+
                 for (int i = 0; i < fireflies.Count; i++)
                 {
                     bool was_moved = false;
@@ -94,6 +137,11 @@ namespace FFA
                         {
                             was_moved = true;
                             move_i_towards_j(i, j);
+
+                            file_moves.Write(string.Format("# {0,4} {1,4} -> {2,4} ", t, i, j));
+                            for (int ii = 0; ii < fireflies.Count; ii++)
+                                file_moves.Write(string.Format("{0,15:0.0000000000}", fireflies[ii].x[0]));
+                            file_moves.WriteLine();
                         }
                     }
                     if (!was_moved)
@@ -116,9 +164,12 @@ namespace FFA
                     best_ever > best_iter && !looking_for_max)
                     best_ever = best_iter;
 
-                Console.WriteLine(String.Format("# {0,4}   Best iter {1,15:0.0000000000}    Best ever {2,15:0.0000000000}", t, best_iter, best_ever));
+                Console.WriteLine(string.Format("# {0,4}   Best iter {1,15:0.0000000000}    Best ever {2,15:0.0000000000}", t, best_iter, best_ever));
+                file.WriteLine(string.Format("# {0,4}   Best iter {1,15:0.0000000000}    Best ever {2,15:0.0000000000}", t, best_iter, best_ever));
+                file_moves.WriteLine("-----------------------------------------------------------------------------------------");
             }
-
+            file.Close();
+            file_moves.Close();
 
             return f(the_best_firefly.x);
         }
