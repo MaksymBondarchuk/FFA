@@ -11,20 +11,20 @@ namespace FFA
         List<Firefly> fireflies;
         double left_border;
         double right_border;
-        double γ = 0.01;    // bigger gamma => bigger step
+        double γ = 1;    // bigger gamma => lesser step
         double α;
         long MaximumGenerations = 1000;
         bool looking_for_max;
         int f_range;
 
-        int f_number = 2;
+        int f_number = 1;
 
         bool file_trace_iters = true;
         System.IO.StreamWriter file = new System.IO.StreamWriter("results.txt");
         bool file_trace_moves = true;
         System.IO.StreamWriter file_moves = new System.IO.StreamWriter("trace_moves.txt");
 
-        double f(List<double> x)
+        public double f(List<double> x)
         {
             double res = 0;
 
@@ -43,6 +43,19 @@ namespace FFA
 
                 default:
                     return 0;
+            }
+        }
+
+        private void Initializiton()
+        {
+            double delta = Math.Abs(left_border - right_border) / (fireflies.Capacity - 1);
+            for (int i = 0; i < fireflies.Capacity; i++)
+            {
+                List<double> x = new List<double>();
+                double xi = left_border + delta * i;
+                for (int j = 0; j < f_range; j++)
+                    x.Add(xi);
+                fireflies.Add(new Firefly(x));
             }
         }
 
@@ -103,18 +116,7 @@ namespace FFA
 
         public double algorithm()
         {
-            List<double> solutions = new List<double>();
-
-            // Initiaizing population of fireflies
-            double delta = Math.Abs(left_border - right_border) / (fireflies.Capacity - 1);
-            for (int i = 0; i < fireflies.Capacity; i++)
-            {
-                List<double> x = new List<double>();
-                double xi = left_border + delta * i;
-                for (int j = 0; j < f_range; j++)
-                    x.Add(xi);
-                fireflies.Add(new Firefly(x));
-            }
+            Initializiton();
 
             Firefly the_best_firefly = fireflies[0];
             double best_ever = 0;
@@ -122,11 +124,6 @@ namespace FFA
             double best_iter;
             for (long t = 0; t < MaximumGenerations; t++)
             {
-                //file.Write(string.Format("# {0,4}", t));
-                //for (int i = 0; i < fireflies.Count; i++)
-                //    file.Write(string.Format("{0,15:0.0000000000}", fireflies[i].x[0]));
-                //file.WriteLine();
-
                 for (int i = 0; i < fireflies.Count; i++)
                 {
                     bool was_moved = false;
