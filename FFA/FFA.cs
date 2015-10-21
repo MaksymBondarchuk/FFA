@@ -11,8 +11,7 @@ namespace FFA
         List<Firefly> fireflies;
         double left_border;
         double right_border;
-        double γ = 1;    // bigger gamma => lesser step
-        double α;
+        double gamma = .05;    // bigger gamma => lesser step
         long MaximumGenerations = 1000;
         bool looking_for_max;
         int f_range;
@@ -23,6 +22,13 @@ namespace FFA
         System.IO.StreamWriter file = new System.IO.StreamWriter("results.txt");
         bool file_trace_moves = true;
         System.IO.StreamWriter file_moves = new System.IO.StreamWriter("trace_moves.txt");
+
+        // Additional
+        double lambda_max = .5;
+        double lambda_min = 1.9;
+        double alpha_max = 1e-4;
+        double alpha_min = .5;
+        double delta;
 
         public double f(List<double> x)
         {
@@ -39,7 +45,7 @@ namespace FFA
 
                 // test
                 case 2:
-                    return x[0]*x[0];
+                    return x[0] * x[0];
 
                 default:
                     return 0;
@@ -62,8 +68,6 @@ namespace FFA
         public FFA(int number_of_fireflies, int f_range)
         {
             fireflies = new List<Firefly>(number_of_fireflies);
-            α = (right_border - left_border) / 100.0;
-            α = 0.1;
             this.f_range = f_range;
 
             switch (f_number)
@@ -81,9 +85,11 @@ namespace FFA
                 default:
                     break;
             }
+
+            delta = Math.Pow(alpha_min / alpha_max, 1 / MaximumGenerations);
         }
 
-        private void move_i_towards_j(int i, int j)
+        private void move_i_towards_j(int i, int j, double alpha, double lambda)
         {
             double r2 = Math.Pow(f(fireflies[i].x) - f(fireflies[j].x), 2);
             for (int h = 0; h < f_range; h++)
@@ -91,8 +97,8 @@ namespace FFA
 
             for (int h = 0; h < f_range; h++)
             {
-                fireflies[i].x[h] += fireflies[i].beta0 * Math.Exp(-γ * r2) * (fireflies[j].x[h] - fireflies[i].x[h])
-                + α * ((new Random()).NextDouble() - .5);
+                fireflies[i].x[h] += fireflies[i].beta0 * Math.Exp(-gamma * r2) * (fireflies[j].x[h] - fireflies[i].x[h])
+                + alpha * ((new Random()).NextDouble() - .5);
                 if (fireflies[i].x[h] < left_border)
                     fireflies[i].x[h] = left_border;
                 else
@@ -101,11 +107,11 @@ namespace FFA
             }
         }
 
-        private void move_randomly(int i)
+        private void move_randomly(int i, double alpha)
         {
             for (int h = 0; h < f_range; h++)
             {
-                fireflies[i].x[h] += α * ((new Random()).NextDouble() - .5);
+                fireflies[i].x[h] += alpha * ((new Random()).NextDouble() - .5);
                 if (fireflies[i].x[h] < left_border)
                     fireflies[i].x[h] = left_border;
                 else
@@ -118,12 +124,16 @@ namespace FFA
         {
             Initializiton();
 
+            RankSwarm();
+
             Firefly the_best_firefly = fireflies[0];
             double best_ever = 0;
             bool best_ever_not_initialized = true;
             double best_iter;
             for (long t = 0; t < MaximumGenerations; t++)
             {
+                double alpha_t = alpha_function(t);
+
                 for (int i = 0; i < fireflies.Count; i++)
                 {
                     bool was_moved = false;
@@ -132,8 +142,9 @@ namespace FFA
                         if (f(fireflies[i].x) < f(fireflies[j].x) && looking_for_max ||
                             f(fireflies[i].x) > f(fireflies[j].x) && !looking_for_max)
                         {
+                            double lambda_i = lambda_function(i);
                             was_moved = true;
-                            move_i_towards_j(i, j);
+                            move_i_towards_j(i, j, alpha_t, lambda_i);
 
                             if (file_trace_moves)
                             {
@@ -145,8 +156,10 @@ namespace FFA
                         }
                     }
                     if (!was_moved)
-                        move_randomly(i);
+                        move_randomly(i, alpha_t);
                 }
+
+                RankSwarm();
 
                 best_iter = f(fireflies[0].x);
                 for (int i = 1; i < fireflies.Count; i++)
@@ -175,6 +188,29 @@ namespace FFA
             file_moves.Close();
 
             return f(the_best_firefly.x);
+        }
+
+        private double lambda_function(int i)
+        {
+            return lambda_max - i * (lambda_max - lambda_min) / (fireflies.Count - 1);
+        }
+
+        private double alpha_function(long iteration)
+        {
+            return alpha_max * Math.Pow(delta, iteration);
+        }
+
+        private void RankSwarm()
+        {
+            for (int i = 0; i < fireflies.Count; i++)
+                for (int j = fireflies.Count - 1; i < j; j--)
+                    if (f(fireflies[j].x) < f(fireflies[i].x) && looking_for_max ||
+                        f(fireflies[j].x) > f(fireflies[i].x) && !looking_for_max)
+                    {
+                        var tmp = fireflies[i];
+                        fireflies[i] = fireflies[j];
+                        fireflies[j] = tmp;
+                    }
         }
     }
 }
