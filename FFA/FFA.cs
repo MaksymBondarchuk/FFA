@@ -98,7 +98,7 @@ namespace FFA
             for (int h = 0; h < f_range; h++)
             {
                 fireflies[i].x[h] += fireflies[i].beta0 * Math.Exp(-gamma * r2) * (fireflies[j].x[h] - fireflies[i].x[h])
-                + alpha * ((new Random()).NextDouble() - .5);
+                + alpha * ((new Random()).NextDouble() - .5) + levy_random(lambda, alpha);
                 if (fireflies[i].x[h] < left_border)
                     fireflies[i].x[h] = left_border;
                 else
@@ -211,6 +211,14 @@ namespace FFA
                         fireflies[i] = fireflies[j];
                         fireflies[j] = tmp;
                     }
+        }
+
+        double levy_random(double lambda, double alpha)
+        {
+            Random random = new Random();
+            double rnd = random.NextDouble();
+            double _f = Math.Pow(rnd, -1 / lambda);
+            return alpha * _f * (random.NextDouble() - .5);
         }
     }
 }
