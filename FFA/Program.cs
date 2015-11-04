@@ -1,18 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace FFA
+﻿namespace FFA
 {
-    class Program
+    internal static class Program
     {
-        static void Main(string[] args)
+        private static void Main()
         {
-            FFA ffa = new FFA(30, 10);
+            var fireflyOptimisationAlgorithm = new FireflyOptimisationAlgorithm(30, 10);
 
-            ffa.algorithm();
+            fireflyOptimisationAlgorithm.Algorithm();
         }
     }
 }

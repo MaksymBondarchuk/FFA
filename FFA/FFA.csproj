@@ -43,7 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="FFA.cs" />
+    <Compile Include="FireflyOptimisationAlgorithm.cs" />
     <Compile Include="Firefly.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

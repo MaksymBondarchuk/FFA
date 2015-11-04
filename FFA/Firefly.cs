@@ -1,19 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace FFA
 {
-    class Firefly
+    internal class Firefly
     {
-        public double beta0 = 1;
-        public List<double> x;
+        public const double Beta0 = 1;
+        public readonly List<double> X;
 
         public Firefly(List<double> x)
         {
-            this.x = x;
+            X = x;
         }
     }
 }
