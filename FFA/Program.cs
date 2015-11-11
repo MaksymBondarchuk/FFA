@@ -57,9 +57,9 @@ namespace FFA
                 LookingForMax = false
             };
 
-            Console.WriteLine(schwefel.F(new List<double> { 420.9687, 420.9687 }));
+            //Console.WriteLine(schwefel.F(new List<double> { 420.9687, 420.9687 }));
 
-            var fireflyOptimisationAlgorithm = new FireflyOptimisationAlgorithm(50, 2, levy);
+            var fireflyOptimisationAlgorithm = new FireflyOptimisationAlgorithm(50, 2, rastrigin);
             fireflyOptimisationAlgorithm.Algorithm();
         }
     }

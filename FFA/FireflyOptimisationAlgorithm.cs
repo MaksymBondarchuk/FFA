@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 
 namespace FFA
 {
@@ -22,7 +23,7 @@ namespace FFA
         private const double AlphaMax = 1e-4;
         private const double AlphaMin = .5;
         private readonly double _delta;
-        
+
 
         private void Initializiton()
         {
@@ -40,13 +41,6 @@ namespace FFA
                 _fireflies.Add(new Firefly(x));
             }
 
-            //const int maxIterations = 1000;
-            //for (var iteration = 0; iteration < maxIterations; iteration++)
-            //{
-                  //var q = rnd.Next(1, _fireflies.Count + 1);
-
-            //}
-
             // ReSharper disable once InvertIf
             if (_fireflies[0].X.Count == 2)
             {
@@ -61,6 +55,74 @@ namespace FFA
                         for (var i2 = y - dotSize; i2 <= y + dotSize; i2++)
                             if (0 <= i1 && i1 < bmp.Size.Height && 0 <= i2 && i2 < bmp.Size.Height)
                                 bmp.SetPixel(i1, i2, Color.Red);
+                }
+                //bmp.Save("Initial Generation.png");
+            }
+
+            const int maxIterations = 1000;
+            for (var iteration = 0; iteration < maxIterations; iteration++)
+            {
+                var q = rnd.Next(1, _fireflies.Count + 1);
+
+                for (var i = 0; i < _fireflies.Count; i++)
+                {
+                    var moved = new List<int>();
+
+                    for (var j = 0; j < q; j++)
+                    {
+                        var min = double.MaxValue;
+                        var imin = -1;
+                        for (var h = 0; h < _fireflies.Count; h++)
+                            if (h != i && !moved.Contains(h) && _func.F(_fireflies[h].X) - _func.F(_fireflies[i].X) < min)
+                            {
+                                min = _func.F(_fireflies[h].X);
+                                imin = h;
+                            }
+
+
+                        var r = Math.Sqrt(Math.Pow(_func.F(_fireflies[imin].X) - _func.F(_fireflies[i].X), 2) + _fireflies[imin].X.Select((t, h) => Math.Pow(t - _fireflies[i].X[h], 2)).Sum());
+
+                        for (var h = 0; h < _fireflies[imin].X.Count; h++)
+                            _fireflies[imin].X[h] += r * .1;
+                        moved.Add(imin);
+
+                    }
+
+                    var a = new List<double>();
+
+
+                    for (var j = 0; j < _fireflies.First().X.Count; j++)
+                        a.Add(0);
+
+                    foreach (var t in _fireflies)
+                        for (var j = 0; j < _fireflies.First().X.Count; j++)
+                            a[j] += t.X[j];
+
+                    for (var j = 0; j < _fireflies.First().X.Count; j++)
+                        a[j] /= _fireflies.Count;
+
+                    var ra = Math.Sqrt(Math.Pow(_func.F(_fireflies[i].X) - _func.F(a), 2) + _fireflies[i].X.Select((t, j) => Math.Pow(t - a[j], 2)).Sum());
+                    for (var h = 0; h < _fireflies[i].X.Count; h++)
+                        _fireflies[i].X[h] += ra * .1;
+                }
+
+                
+            }
+
+            // ReSharper disable once InvertIf
+            if (_fireflies[0].X.Count == 2)
+            {
+                const int dotSize = 3;
+                foreach (var t in _fireflies)
+                {
+                    var x = Convert.ToInt32(t.X[0] * bmpSize * .5 / _func.Range + bmpSize * .5);
+                    var y = Convert.ToInt32(t.X[1] * bmpSize * .5 / _func.Range + bmpSize * .5);
+                    //Console.WriteLine($"{t.X[0],4} -> {x,4}");
+                    //Console.WriteLine($"{t.X[1],4} -> {y,4}");
+                    for (var i1 = x - dotSize; i1 <= x + dotSize; i1++)
+                        for (var i2 = y - dotSize; i2 <= y + dotSize; i2++)
+                            if (0 <= i1 && i1 < bmp.Size.Height && 0 <= i2 && i2 < bmp.Size.Height)
+                                bmp.SetPixel(i1, i2, Color.Blue);
                 }
                 bmp.Save("Initial Generation.png");
             }
