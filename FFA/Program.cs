@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace FFA
@@ -7,16 +8,58 @@ namespace FFA
     {
         private static void Main()
         {
-            var Rastrigin = new Function
+            // ReSharper disable once UnusedVariable
+            var rastrigin = new Function
             {
-                F = x => { return x.Sum(t => t*t - 10*Math.Cos(2*Math.PI*t) + 10); },
+                // Global min at 0*
+                F = x => { return x.Sum(t => t * t - 10 * Math.Cos(2 * Math.PI * t) + 10); },
                 Range = 5.12,
                 LookingForMax = false
             };
 
-            var fireflyOptimisationAlgorithm = new FireflyOptimisationAlgorithm(50, 2, Rastrigin);
+            // ReSharper disable once UnusedVariable
+            var griewank = new Function
+            {
+                // Global min at 0*
+                F = x =>
+                {
+                    var mul = 1.0;
+                    for (var i = 0; i < x.Count; i++)
+                        mul *= Math.Cos(x[i] / Math.Sqrt(i + 1));
+                    return x.Sum(t => t * t / 4000) - mul + 1;
+                },
+                Range = 600,
+                LookingForMax = false
+            };
 
+            // ReSharper disable once UnusedVariable
+            var levy = new Function
+            {
+                // Global min at 1*
+                F = x =>
+                {
+                    var sum = 0.0;
+                    for (var i = 0; i < x.Count - 1; i++)
+                        sum += Math.Pow((x[i] - 1) * .25, 2) * (1 + 10 * Math.Pow(Math.Sin(Math.PI * (1 + (x[i] - 1) * .25) + 1), 2));
+                    return Math.Pow(Math.Sin(Math.PI * (1 + (x.First() - 1) * .25)), 2) + sum +
+                    Math.Pow((x.Last() - 1) * .25, 2) * (1 + Math.Pow(Math.Sin(2 * Math.PI * (1 + (x.Last() - 1) * .25)), 2));
+                },
+                Range = 10,
+                LookingForMax = false
+            };
 
+            // ReSharper disable once UnusedVariable
+            var schwefel = new Function
+            {
+                // Global min at 420.9687*
+                F = x => { return 418.9829 * x.Count - x.Sum(t => t * Math.Sin(Math.Sqrt(t))); },
+                Range = 500,
+                LookingForMax = false
+            };
+
+            Console.WriteLine(schwefel.F(new List<double> { 420.9687, 420.9687 }));
+
+            var fireflyOptimisationAlgorithm = new FireflyOptimisationAlgorithm(50, 2, levy);
             fireflyOptimisationAlgorithm.Algorithm();
         }
     }

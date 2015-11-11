@@ -47,6 +47,7 @@ namespace FFA
 
             //}
 
+            // ReSharper disable once InvertIf
             if (_fireflies[0].X.Count == 2)
             {
                 const int dotSize = 3;
