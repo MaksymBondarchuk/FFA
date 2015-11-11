@@ -44,8 +44,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="FireflyOptimisationAlgorithm.cs" />
     <Compile Include="Firefly.cs" />
+    <Compile Include="FireflyOptimisationAlgorithm.cs" />
     <Compile Include="Function.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
