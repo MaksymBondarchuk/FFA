@@ -4,12 +4,29 @@ namespace FFA
 {
     internal class Firefly
     {
-        public const double Beta0 = 1;
+        /// <summary>
+        /// Initial brightness
+        /// </summary>
+        public const double Beta0 = .5;
+        /// <summary>
+        /// Coordinates in X.Count-dimensions
+        /// </summary>
         public readonly List<double> X;
+        /// <summary>
+        /// Function value for firefly
+        /// </summary>
+        public double F;
 
-        public Firefly(List<double> x)
+        /// <summary>
+        /// Creates firefly
+        /// </summary>
+        /// <param name="x">Coordinates</param>
+        /// <param name="f">Function value</param>
+        public Firefly(List<double> x, double f)
         {
             X = x;
         }
+
+        //Comparer<> 
     }
 }

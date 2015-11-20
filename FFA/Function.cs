@@ -5,10 +5,13 @@ namespace FFA
 {
     public class Function
     {
+        /// <summary>
+        /// Function
+        /// </summary>
         public Func<List<double>, double> F;
+        /// <summary>
+        /// Range of function (left and right borders)
+        /// </summary>
         public double Range;
-        public bool LookingForMax;
-
-        //public double F(List<double> x) { };
     }
 }
