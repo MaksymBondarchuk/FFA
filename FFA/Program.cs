@@ -62,7 +62,7 @@ namespace FFA
 
             //Console.WriteLine(schwefel.F(new List<double> { 420.9687, 420.9687 }));
 
-            var fireflyOptimisationAlgorithm = new FireflyOptimisationAlgorithm(50, 33, sphere);
+            var fireflyOptimisationAlgorithm = new FireflyOptimisationAlgorithm(numberOfFireflies: 50, fRange: 33, func: sphere);
             //for (var lambda = .5; lambda < 1.9; lambda += .01)
             //{
             //    Console.WriteLine(fireflyOptimisationAlgorithm.MantegnaRandom(lambda));

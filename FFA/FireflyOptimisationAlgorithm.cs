@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-//using System.Drawing;
+
 
 namespace FFA
 {
@@ -28,10 +28,6 @@ namespace FFA
 
         private void Initializiton()
         {
-            //const int bmpSize = 1000;
-            //var bmp = new Bitmap(bmpSize, bmpSize);
-
-            // Generating list of random points
             var rnd = new Random();
             for (var i = 0; i < _fireflies.Capacity; i++)
             {
@@ -40,87 +36,6 @@ namespace FFA
                     x.Add(-_func.Range + rnd.NextDouble() * _func.Range * 2);
                 _fireflies.Add(new Firefly(x, _func.F(x)));
             }
-
-            //// ReSharper disable once InvertIf
-            //if (_fireflies[0].X.Count == 2)
-            //{
-            //    const int dotSize = 3;
-            //    foreach (var t in _fireflies)
-            //    {
-            //        var x = Convert.ToInt32(t.X[0] * bmpSize * .5 / _func.Range + bmpSize * .5);
-            //        var y = Convert.ToInt32(t.X[1] * bmpSize * .5 / _func.Range + bmpSize * .5);
-            //        //Console.WriteLine($"{t.X[0],4} -> {x,4}");
-            //        //Console.WriteLine($"{t.X[1],4} -> {y,4}");
-            //        for (var i1 = x - dotSize; i1 <= x + dotSize; i1++)
-            //            for (var i2 = y - dotSize; i2 <= y + dotSize; i2++)
-            //                if (0 <= i1 && i1 < bmp.Size.Height && 0 <= i2 && i2 < bmp.Size.Height)
-            //                    bmp.SetPixel(i1, i2, Color.Red);
-            //    }
-            //    //bmp.Save("Initial Generation.png");
-            //}
-            //var q = rnd.Next(_fireflies.Count * 5, _fireflies.Count * 10);
-
-            //const int maxIterations = 10;
-            //for (var iteration = 0; iteration < maxIterations; iteration++)
-            //{
-
-
-            //    for (var i = 0; i < _fireflies.Count; i++)
-            //    {
-            //        var moved = new List<int>();
-
-            //        for (var j = 0; j < q; j++)
-            //        {
-            //            var min = double.MaxValue;
-            //            var imin = -1;
-            //            for (var h = 0; h < _fireflies.Count; h++)
-            //                if (h != i && !moved.Contains(h) && _func.F(_fireflies[h].X) - _func.F(_fireflies[i].X) < min)
-            //                {
-            //                    min = _func.F(_fireflies[h].X);
-            //                    imin = h;
-            //                }
-
-            //            //var r = Math.Sqrt(Math.Pow(_func.F(_fireflies[imin].X) - _func.F(_fireflies[i].X), 2) + _fireflies[imin].X.Select((t, h) => Math.Pow(t - _fireflies[i].X[h], 2)).Sum());
-            //            for (var h = 0; h < _fireflies[imin].X.Count; h++)
-            //                _fireflies[imin].X[h] += (_fireflies[i].X[h] - _fireflies[imin].X[h]) * .001;
-            //            moved.Add(imin);
-
-            //        }
-
-            //        var a = new List<double>();
-            //        for (var j = 0; j < _fireflies.First().X.Count; j++)
-            //            a.Add(0);
-            //        foreach (var t in _fireflies)
-            //            for (var j = 0; j < _fireflies.First().X.Count; j++)
-            //                a[j] += t.X[j];
-            //        for (var j = 0; j < _fireflies.First().X.Count; j++)
-            //            a[j] /= _fireflies.Count;
-
-            //        //var ra = Math.Sqrt(Math.Pow(_func.F(_fireflies[i].X) - _func.F(a), 2) + _fireflies[i].X.Select((t, j) => Math.Pow(t - a[j], 2)).Sum());
-            //        for (var h = 0; h < _fireflies[i].X.Count; h++)
-            //            _fireflies[i].X[h] += (a[h] - _fireflies[i].X[h]) * .1;
-            //    }
-
-
-            //}
-
-            //// ReSharper disable once InvertIf
-            //if (_fireflies[0].X.Count == 2)
-            //{
-            //    const int dotSize = 3;
-            //    foreach (var t in _fireflies)
-            //    {
-            //        var x = Convert.ToInt32(t.X[0] * bmpSize * .5 / _func.Range + bmpSize * .5);
-            //        var y = Convert.ToInt32(t.X[1] * bmpSize * .5 / _func.Range + bmpSize * .5);
-            //        //Console.WriteLine($"{t.X[0],4} -> {x,4}");
-            //        //Console.WriteLine($"{t.X[1],4} -> {y,4}");
-            //        for (var i1 = x - dotSize; i1 <= x + dotSize; i1++)
-            //            for (var i2 = y - dotSize; i2 <= y + dotSize; i2++)
-            //                if (0 <= i1 && i1 < bmp.Size.Height && 0 <= i2 && i2 < bmp.Size.Height)
-            //                    bmp.SetPixel(i1, i2, Color.LawnGreen);
-            //    }
-            //    bmp.Save("Initial Generation.png");
-            //}
         }
 
         /// <summary>
@@ -159,9 +74,10 @@ namespace FFA
                 //_fireflies[i].X[h] += Firefly.Beta0 * Math.Exp(-Gamma * r2) * (_fireflies[j].X[h] - _fireflies[i].X[h]);
                 //var brightness = Firefly.Beta0*Math.Exp(-Gamma*r2)*(_fireflies[j].X[h] - _fireflies[i].X[h]);
                 var brightness = Firefly.Beta0 / (1 + Gamma * r2);
-                //var randomPart = alpha * ((new Random()).NextDouble() - .5) + LevyRandom(lambda, alpha);
-                var randomPart = alpha * ((new Random()).NextDouble() - .5) + MantegnaRandom(lambda);
-                _fireflies[i].X[h] += brightness + randomPart;
+                var randomPart = alpha * (new Random().NextDouble() - .5) + LevyRandom(lambda, alpha);
+                //var randomPart = alpha*(new Random().NextDouble() - .5) + MantegnaRandom(lambda);
+                _fireflies[i].X[h] += brightness * (_fireflies[j].X[h] - _fireflies[i].X[h]) + randomPart;
+                //_fireflies[i].X[h] += (_fireflies[j].X[h] - _fireflies[i].X[h])*.1;
                 if (_fireflies[i].X[h] < -_func.Range)
                     _fireflies[i].X[h] = -_func.Range;
                 else
@@ -201,36 +117,73 @@ namespace FFA
             {
                 var alphaT = AlphaFunction(t);
 
+                // ReSharper disable once ConditionIsAlwaysTrueOrFalse
+                if (TraceMoves)
+                {
+                    foreach (var ff in _fireflies)
+                        _fileMoves.Write($"{ff.F,20:0.0000000000}");
+                    _fileMoves.WriteLine();
+                }
+
                 for (var i = 0; i < _fireflies.Count; i++)
                 {
+                    var wasMoved = false;
                     for (var j = 0; j < _fireflies.Count; j++)
                     {
-                        if (i == j || _fireflies[i].F > _fireflies[j].F)
+                        if (i == j || _fireflies[i].F < _fireflies[j].F)
                             continue;
 
+                        // ReSharper disable once RedundantLogicalConditionalExpressionOperand
+                        if (TraceMoves && !wasMoved)
+                        {
+                            _fileMoves.Write($"# {t,4} {i,4} ->");
+                            wasMoved = true;
+                        }
+
                         var lambdaI = LambdaFunction(i);
-                        MoveITowardsJ(i, j, alphaT, lambdaI);
 
                         // ReSharper disable once InvertIf
                         // ReSharper disable once ConditionIsAlwaysTrueOrFalse
                         if (TraceMoves)
                         {
-                            _fileMoves.Write("# {0,4} {1,4} -> {2,4} ", t, i, j);
-                            foreach (var t1 in _fireflies[i].X)
-                                _fileMoves.Write("{0,15:0.0000000000}", t1);
-                            //foreach (var t1 in _fireflies)
-                                //_fileMoves.Write("{0,15:0.0000000000}", t1.X[0]);
-                            _fileMoves.WriteLine();
+                            _fileMoves.Write($" {j,2} ");
+
+                            //foreach (var ff in _fireflies)
+                            //    _fileMoves.Write($"{ff.F,20:0.0000000000}");
+                            //_fileMoves.WriteLine();
                         }
 
+                        MoveITowardsJ(i, j, alphaT, lambdaI);
+
+                        // ReSharper disable once InvertIf
+                        // ReSharper disable once ConditionIsAlwaysTrueOrFalse
+                        //if (TraceMoves)
+                        //{
+                        //    _fileMoves.Write("A # {0,4} {1,4} -> {2,4} ", t, i, j);
+                        //    foreach (var t1 in _fireflies)
+                        //        _fileMoves.Write("{0,20:0.0000000000}", t1.F);
+                        //    _fileMoves.WriteLine();
+                        //}
                     }
+
+                    // ReSharper disable once ConditionIsAlwaysTrueOrFalse
+                    if (TraceMoves)
+                        _fileMoves.WriteLine();
+                }
+
+                // ReSharper disable once ConditionIsAlwaysTrueOrFalse
+                if (TraceMoves)
+                {
+                    foreach (var ff in _fireflies)
+                        _fileMoves.Write($"{ff.F,20:0.0000000000}");
+                    _fileMoves.WriteLine();
                 }
 
                 RankSwarm();
 
                 var bestIter = _func.F(_fireflies[0].X);
                 for (var i = 1; i < _fireflies.Count; i++)
-                    if (bestIter > _fireflies[i].F)
+                    if (bestIter < _fireflies[i].F)
                         bestIter = _fireflies[i].F;
 
                 if (bestEverNotInitialized)
@@ -239,11 +192,11 @@ namespace FFA
                     bestEverNotInitialized = false;
                 }
                 else
-                if (bestEver > bestIter)
+                if (bestIter < bestEver)
                     bestEver = bestIter;
 
                 Console.WriteLine("# {0,3} Best iter {1,15:0.0000000000} Best ever {2,15:0.0000000000} Alpha {3,11:0.00000000}", t, bestIter, bestEver, alphaT);
-                _file.WriteLine("# {0,3} Best iter {1,15:0.0000000000} Best ever {2,15:0.0000000000} Alpha {3,11:0.00000000}", t, bestIter, bestEver, alphaT);
+                _file.WriteLine("# {0,3}    Best iter {1,20:0.0000000000}    Best ever {2,20:0.0000000000}    Alpha {3,11:0.00000000}", t, bestIter, bestEver, alphaT);
                 // ReSharper disable once ConditionIsAlwaysTrueOrFalse
                 if (TraceMoves)
                 {
@@ -305,6 +258,7 @@ namespace FFA
             return mue + sigma * y;
         }
 
+        // ReSharper disable once UnusedMember.Local
         private double MantegnaRandom(double lambda)
         {
             SpecialFunction.lgamma(lambda + 1);

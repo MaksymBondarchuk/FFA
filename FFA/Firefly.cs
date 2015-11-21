@@ -25,6 +25,7 @@ namespace FFA
         public Firefly(List<double> x, double f)
         {
             X = x;
+            F = f;
         }
 
         //Comparer<> 
