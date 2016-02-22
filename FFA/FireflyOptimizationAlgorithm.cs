@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace FFA
 {
-    public class FireflyOptimisationAlgorithm
+    public class FireflyOptimizationAlgorithm
     {
         private readonly List<Firefly> _fireflies;
         private const double Gamma = .0001; // bigger Gamma => lesser step
@@ -26,7 +26,7 @@ namespace FFA
         private readonly double _delta;
 
 
-        private void Initializiton()
+        private void Initialization()
         {
             var rnd = new Random();
             for (var i = 0; i < _fireflies.Capacity; i++)
@@ -44,7 +44,7 @@ namespace FFA
         /// <param name="numberOfFireflies">Size of fireflies generation</param>
         /// <param name="fRange">Range of researched function</param>
         /// <param name="func">Function</param>
-        public FireflyOptimisationAlgorithm(int numberOfFireflies, int fRange, Function func)
+        public FireflyOptimizationAlgorithm(int numberOfFireflies, int fRange, Function func)
         {
             _fireflies = new List<Firefly>(numberOfFireflies);
             _fRange = fRange;
@@ -106,7 +106,7 @@ namespace FFA
         // ReSharper disable once UnusedMethodReturnValue.Global
         public double Algorithm()
         {
-            Initializiton();
+            Initialization();
 
             RankSwarm();
 

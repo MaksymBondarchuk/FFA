@@ -27,7 +27,5 @@ namespace FFA
             X = x;
             F = f;
         }
-
-        //Comparer<> 
     }
 }
