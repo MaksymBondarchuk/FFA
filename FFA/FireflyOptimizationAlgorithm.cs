@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Linq;
 
 
 namespace FFA
@@ -34,9 +36,113 @@ namespace FFA
                 var x = new List<double>();
                 for (var j = 0; j < _fRange; j++)
                     x.Add(-_func.Range + rnd.NextDouble() * _func.Range * 2);
-                _fireflies.Add(new Firefly(x, _func.F(x)));
+                _fireflies.Add(new Firefly { X = x, F = _func.F(x) });
+            }
+
+            CentroidalVoronoiTessellations();
+        }
+
+
+        public void CentroidalVoronoiTessellations()
+        {
+            // Show result for function of 2 variables
+            const int bmpSize = 1000;
+            var bmp = new Bitmap(bmpSize, bmpSize);
+            if (_fRange == 2)
+            {
+                const int dotSize = 3;
+                foreach (var t in _fireflies)
+                {
+                    var x = Convert.ToInt32(t.X[0] * bmpSize * .5 / _func.Range + bmpSize * .5);
+                    var y = Convert.ToInt32(t.X[1] * bmpSize * .5 / _func.Range + bmpSize * .5);
+                    for (var i1 = x - dotSize; i1 <= x + dotSize; i1++)
+                        for (var i2 = y - dotSize; i2 <= y + dotSize; i2++)
+                            if (0 <= i1 && i1 < bmp.Size.Height && 0 <= i2 && i2 < bmp.Size.Height)
+                                bmp.SetPixel(i1, i2, Color.Blue);
+                }
+            }
+
+            var q = _fireflies.Count * 100;
+            var rnd = new Random();
+
+            const int centroidalVoronoiTessellationsIterations = 1000;
+            for (var iteration = 0; iteration < centroidalVoronoiTessellationsIterations; iteration++)
+            {
+                // Choose q random points 
+                var qList = new List<Firefly>(q);
+                for (var i = 0; i < q; i++)
+                {
+                    qList.Add(new Firefly());
+                    for (var j = 0; j < _fRange; j++)
+                        qList[i].X.Add(-_func.Range + rnd.NextDouble() * _func.Range * 2);
+                }
+
+                var qShortestDistanceTo = new List<int>(q);
+                foreach (var point in qList)
+                {
+                    var minDist = double.MaxValue;
+                    var minDistFirefly = 0;
+                    for (var j = 0; j < _fireflies.Count; j++)
+                    {
+                        var r2 = _fireflies[j].X.Select((t, h) => Math.Pow(_fireflies[j].X[h] - point.X[h], 2)).Sum();
+                        if (r2 < minDist)
+                        {
+                            minDist = r2;
+                            minDistFirefly = j;
+                        }
+                    }
+                    qShortestDistanceTo.Add(minDistFirefly);
+                }
+
+                // Calculate ai
+                for (var i = 0; i < _fireflies.Count; i++)
+                {
+                    var ai = new Firefly();
+                    for (var h = 0; h < _fRange; h++)
+                        ai.X.Add(0);
+
+                    var isGeneratorForSomeone = false;
+                    var numberOfPoints = 0;
+                    for (var idx = 0; idx < qShortestDistanceTo.Count; idx++)
+                        if (qShortestDistanceTo[idx] == i)
+                        {
+                            isGeneratorForSomeone = true;
+                            numberOfPoints++;
+                            for (var h = 0; h < _fRange; h++)
+                                ai.X[h] += qList[idx].X[h];
+                        }
+
+                    for (var h = 0; h < _fRange; h++)
+                        ai.X[h] /= numberOfPoints;
+
+                    if (isGeneratorForSomeone)
+                        for (var j = 0; j < _fireflies[i].X.Count; j++)
+                            _fireflies[i].X[j] += (ai.X[j] - _fireflies[i].X[j]) * .1;
+                }
+
+                Console.WriteLine($"Voronoi Tessellations Iteration #{iteration}");
+            }
+
+
+            // Show result for function of 2 variables
+            if (_fRange == 2)
+            {
+                const int dotSize = 3;
+                foreach (var t in _fireflies)
+                {
+                    var x = Convert.ToInt32(t.X[0] * bmpSize * .5 / _func.Range + bmpSize * .5);
+                    var y = Convert.ToInt32(t.X[1] * bmpSize * .5 / _func.Range + bmpSize * .5);
+                    //Console.WriteLine($"{t.X[0],4} -> {x,4}");
+                    //Console.WriteLine($"{t.X[1],4} -> {y,4}");
+                    for (var i1 = x - dotSize; i1 <= x + dotSize; i1++)
+                        for (var i2 = y - dotSize; i2 <= y + dotSize; i2++)
+                            if (0 <= i1 && i1 < bmp.Size.Height && 0 <= i2 && i2 < bmp.Size.Height)
+                                bmp.SetPixel(i1, i2, Color.Red);
+                }
+                bmp.Save("Initial Generation.png");
             }
         }
+
 
         /// <summary>
         /// Creates object for algorithm

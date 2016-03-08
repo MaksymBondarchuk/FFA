@@ -11,21 +11,21 @@ namespace FFA
         /// <summary>
         /// Coordinates in X.Count-dimensions
         /// </summary>
-        public readonly List<double> X;
+        public List<double> X = new List<double>();
         /// <summary>
         /// Function value for firefly
         /// </summary>
         public double F;
 
-        /// <summary>
-        /// Creates firefly
-        /// </summary>
-        /// <param name="x">Coordinates</param>
-        /// <param name="f">Function value</param>
-        public Firefly(List<double> x, double f)
-        {
-            X = x;
-            F = f;
-        }
+        ///// <summary>
+        ///// Creates firefly
+        ///// </summary>
+        ///// <param name="x">Coordinates</param>
+        ///// <param name="f">Function value</param>
+        //public Firefly(List<double> x, double f)
+        //{
+        //    X = x;
+        //    F = f;
+        //}
     }
 }
