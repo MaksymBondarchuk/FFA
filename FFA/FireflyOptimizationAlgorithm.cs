@@ -42,10 +42,13 @@ namespace FFA
             CentroidalVoronoiTessellations();
         }
 
-
+        /// <summary>
+        /// Modifies initial set
+        /// </summary>
         public void CentroidalVoronoiTessellations()
         {
             // Show result for function of 2 variables
+            #region Initial print to image
             const int bmpSize = 1000;
             var bmp = new Bitmap(bmpSize, bmpSize);
             if (_fRange == 2)
@@ -61,6 +64,7 @@ namespace FFA
                                 bmp.SetPixel(i1, i2, Color.Blue);
                 }
             }
+            #endregion
 
             var q = _fireflies.Count * 100;
             var rnd = new Random();
@@ -123,7 +127,7 @@ namespace FFA
                 Console.WriteLine($"Voronoi Tessellations Iteration #{iteration}");
             }
 
-
+            #region Final print to image
             // Show result for function of 2 variables
             if (_fRange == 2)
             {
@@ -141,6 +145,7 @@ namespace FFA
                 }
                 bmp.Save("Initial Generation.png");
             }
+            #endregion
         }
 
 
