@@ -12,7 +12,7 @@ namespace FFA
         /// <summary>
         /// Coordinates in X.Count-dimensions
         /// </summary>
-        public List<double> X = new List<double>();
+        public double[] X;
 
         /// <summary>
         /// Function value for firefly

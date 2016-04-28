@@ -22,7 +22,7 @@ namespace FFA
                 F = x =>
                 {
                     var mul = 1.0;
-                    for (var i = 0; i < x.Count; i++)
+                    for (var i = 0; i < x.Length; i++)
                         mul *= Math.Cos(x[i] / Math.Sqrt(i + 1));
                     return x.Sum(t => t * t / 4000) - mul + 1;
                 },
@@ -36,7 +36,7 @@ namespace FFA
                 F = x =>
                 {
                     var sum = 0.0;
-                    for (var i = 0; i < x.Count - 1; i++)
+                    for (var i = 0; i < x.Length - 1; i++)
                         sum += Math.Pow((x[i] - 1) * .25, 2) * (1 + 10 * Math.Pow(Math.Sin(Math.PI * (1 + (x[i] - 1) * .25) + 1), 2));
                     return Math.Pow(Math.Sin(Math.PI * (1 + (x.First() - 1) * .25)), 2) + sum +
                     Math.Pow((x.Last() - 1) * .25, 2) * (1 + Math.Pow(Math.Sin(2 * Math.PI * (1 + (x.Last() - 1) * .25)), 2));
@@ -48,7 +48,7 @@ namespace FFA
             var schwefel = new Function
             {
                 // Global min at 420.9687*
-                F = x => { return 418.9829 * x.Count - x.Sum(t => t * Math.Sin(Math.Sqrt(t))); },
+                F = x => { return 418.9829 * x.Length - x.Sum(t => t * Math.Sin(Math.Sqrt(t))); },
                 Range = 500
             };
 
@@ -63,7 +63,7 @@ namespace FFA
             //Console.WriteLine(schwefel.F(new List<double> { 420.9687, 420.9687 }));
 
             var fireflyOptimizationAlgorithm = new 
-                FireflyOptimizationAlgorithm(numberOfFireflies: 50, fRange: 33, func: sphere);
+                FireflyOptimizationAlgorithm(numberOfFireflies: 50, fRange: 100, func: sphere);
             //for (var lambda = .5; lambda < 1.9; lambda += .01)
             //{
             //    Console.WriteLine(fireflyOptimizationAlgorithm.MantegnaRandom(lambda));

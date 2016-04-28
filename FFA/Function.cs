@@ -8,7 +8,7 @@ namespace FFA
         /// <summary>
         /// Function
         /// </summary>
-        public Func<List<double>, double> F;
+        public Func<double[], double> F;
 
         /// <summary>
         /// Range of function (left and right borders)
@@ -16,7 +16,7 @@ namespace FFA
         public double Range;
 
 
-        public double FitnessFunction(List<double> x)
+        public double FitnessFunction(double[] x)
         {
             var f = F(x);
             if (Math.Abs(f + 1) < 1e-20)
