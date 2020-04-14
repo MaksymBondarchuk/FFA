@@ -18,7 +18,7 @@ namespace FFA
 
         public double FitnessFunction(double[] x)
         {
-            var f = F(x);
+            double f = F(x);
             if (Math.Abs(f + 1) < 1e-20)
                 return 0;
             return 1 / (1 + f);
